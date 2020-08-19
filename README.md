@@ -1,67 +1,66 @@
 Discourse Mobile App for a Single Site (with support for Push Notifications)
 --- 
 
-Whitelisted iOS app for a single Discourse site that supports Push Notifications via OneSignal. 
+Whitelisted iOS app for a single Discourse forum with push notification support via OneSignal. Built with React Native and inspired by [DiscourseMobile](https://github.com/discourse/DiscourseMobile). For a demonstration check out SWAPD or TekInvestor on the App Store or Google Play. 
 
-Built with React Native. Inspired by [DiscourseMobile](https://github.com/discourse/DiscourseMobile).
+## Android (deprecated)
 
-For a demonstration check out SWAPD or TekInvestor on the App Store or Google Play. 
+This app's support for Android is deprecated as Android notifications are now supported directly in Discourse. In your Discourse instance, enable the `push notifications prompt` admin setting. In applicable browsers (incl. Chrome for Android) users will see a bar prompting them to enable notifications.
 
-### Do not use this for Android, use web notifications instead
-
-As of September 2018, this app's support for Android will be deprecated. There is now a better way to have notifications in Android from your Discourse site directly. In your Discourse instance, enable the `push notifications prompt` admin setting. This will now let users of your site in applicable browsers (incl. Chrome for Android) see a bar prompting them to enable notifications. And done!
-
-Android-specific instructions below are now outdated. 
+## iOS 
 
 ### Getting Started
 
-1. Install React Native.
+This is a slightly modified version of the [React Native Getting Started](https://facebook.github.io/react-native/docs/getting-started.html) instructions. These instructions are for OSX.
+
+1. Ensure your xCode is up to date and you have the latest version of the Command Line Tools installed.
+
+2. Install Node (if not already present)
 ```
-npm install -g react-native-cli
+brew install node
 ```
 
-2. Install your packages:
-```
-npm install
-```
+3. Copy the contents of `default.variables.js` to `app.variables.js` and set your app's variables.
 
-3. Copy the contents of `default.variables.js` to `app.variables.js` to set your app's variables (site URL, app name, colors, marketing text, etc.). 
+Starting from the root folder of this repository on your local machine:
 
-4. In the `ios` folder (`cd ios`, run 
+4. Navigate to the `ios` folder in this repository and install its CocoaPods
 ```
+cd ios
 pod install
 ```
-This will link the libraries in xCode. 
 
-5. To run the app locally use:
+5. Navigate back to the main app folder and start the react native server
 
 ```
-react-native run-ios
+cd ..
+npx react-native start
 ```
-
-See the [React Native](https://facebook.github.io/react-native/docs/getting-started.html) docs for more details. 
+6. Open a new terminal tab and run the app
+```
+npx react-native run-ios
+```
 
 ### OneSignal setup
 
-You need to open an account at OneSignal to be able to send Push Notifications (PNs) from your Discourse site, and receive them in the app. Steps: 
+You need to open a OneSignal account to be able to send push notifications from Discourse, and receive them in the app. 
 
-- Register an App ID on the Apple portal (developer.apple.com)
-- Open an account with [OneSignal](https://www.onesignal.com) (free), create a new app, and generate certificates for iOS and Android
-- Create the provisioning profiles on the Apple portal. You need a distribution profile for pushing to TestFlight and the App Store, and likely an ad-hoc profile for testing quickly on your device. (Note that you may also need a development certificate for testing the app on your device. Step 2 above creates only the production certificate.)
-- Create an iCloud container and associate it with your App ID.
+1. Register an App ID on the Apple portal (developer.apple.com).
+2. Open an account with [OneSignal](https://www.onesignal.com) (free), create a new app, and generate certificates for iOS.
+3. Create provisioning profiles on the Apple portal. You need a distribution profile for pushing to TestFlight and the App Store, and an ad-hoc profile for testing quickly on your device. (Note that you may also need a development certificate for testing the app on your device. Step 2 above creates only the production certificate.)
+4. Create an iCloud container and associate it with your App ID.
 
-#### OneSignal Discourse Setup
+#### Discourse Setup
 
-- Add the [discourse-onesignal](https://github.com/pmusaraj/discourse-onesignal/) plugin to your Discourse instance and configure it: enable notifications, add your OneSignal App ID and the OneSignal REST API key.
-- In your Discourse settings, add your site's home URL to `allowed user api auth redirects` (the app will redirect to your home URL once the user authorizes access for the app in Discourse). 
-- ~And add the OneSignal API Endpoint `https://onesignal.com/api/v1/notifications` to `allowed user api push urls`.~ This step is no longer needed, because it causes Discourse to send a second request to OneSignal (which fails). If you have previously added this to your configuration, you should remove it once your app has been updated to include [this commit](https://github.com/pmusaraj/discourse-mobile-single-site-app/commit/c98ab1468ffb03030ff9793d17fe43af99d995a6).
+- Add the [discourse-onesignal](https://github.com/pmusaraj/discourse-onesignal/) plugin to your Discourse instance and configure it by enable notifications, add your OneSignal App ID and the OneSignal REST API key.
+
+- In your Discourse settings, add your site's home URL to `allowed user api auth redirects` (the app will redirect to your home URL once the user authorizes access for the app in Discourse).
 
 #### OneSignal updates to native code
 
-In your app code for either iOS or Android, you need to replace the placeholder OneSignal App ID with your app's OneSignal App ID. 
+In your app code for iOS replace the placeholder OneSignal App ID with your app's OneSignal App ID. 
 
-- For iOS, look for `ONESIGNAL_APP_ID` in `ios/DiscoSingle/AppDelegate.m`. 
-- For Android, look for `DISCOSINGLE_ONESIGNAL_APP_ID` and `DISCOSINGLE_GOOGLE_PROJECT_NUMBER` in `android/app/build.gradle`. (You will get the Google Project Number while setting up OneSignal for your Android app.) 
+- For iOS, look for `ONESIGNAL_APP_ID` in `ios/DiscoSingle/AppDelegate.m`.  
 
 You should now be ready to build and test the app. Note that in iOS, Push Notifications can only be tested on a real device, but the OneSignal console will show attempts to enable Push Notifications from a simulator.
 
@@ -79,14 +78,7 @@ yo rn-toolbox:assets --splash splash.png --ios
 ```
 
 #### Logo for login screen
-The logo file for the login screen is under `js/logo.png`. Replace it with your logo.  
-
-#### Android build using Gradle
-Follow the [official React Native](https://facebook.github.io/react-native/docs/signed-apk-android.html) instructions on generating a key and an APK for release. Then run
-```
-cd android && ./gradlew assembleRelease
-```
-and find your release file under `android/app/build/outputs/apk/app-release.apk`. 
+The logo file for the login screen is under `js/logo.png`. Replace it with your logo. 
 
 #### Renaming your App
 
@@ -103,5 +95,4 @@ After renaming the app, you need to manually edit some files in subfolders under
 
 ### Troubleshooting
 
-- Android file uploads may fail. The app uses https://github.com/dahjelle/react-native-android-webview-file-image-upload to enable file uploads in WebView, but it's not tested with all versions of Android.
 - If you have already checked out the project, and renamed the app, you may run into a variety of file conflicts if you pull updates. This is especially the case if the React Native version in the project has been updated. This is normal, and a better course of action is to check out a fresh copy, and reapply your changes and the rename. 
