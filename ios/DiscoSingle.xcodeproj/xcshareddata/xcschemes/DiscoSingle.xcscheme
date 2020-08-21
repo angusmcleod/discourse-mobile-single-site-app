@@ -29,7 +29,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "DiscoSingle.app"
+               BuildableName = "RZIM Connect Test.app"
                BlueprintName = "DiscoSingle"
                ReferencedContainer = "container:DiscoSingle.xcodeproj">
             </BuildableReference>
@@ -55,6 +55,15 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
+            BuildableName = "RZIM Connect Test.app"
+            BlueprintName = "DiscoSingle"
+            ReferencedContainer = "container:DiscoSingle.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <Testables>
          <TestableReference
             skipped = "NO">
@@ -65,19 +74,13 @@
                BlueprintName = "DiscoSingleTests"
                ReferencedContainer = "container:DiscoSingle.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "DiscoSingleTests">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "DiscoSingle.app"
-            BlueprintName = "DiscoSingle"
-            ReferencedContainer = "container:DiscoSingle.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -94,13 +97,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "DiscoSingle.app"
+            BuildableName = "RZIM Connect Test.app"
             BlueprintName = "DiscoSingle"
             ReferencedContainer = "container:DiscoSingle.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -113,7 +114,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "DiscoSingle.app"
+            BuildableName = "RZIM Connect Test.app"
             BlueprintName = "DiscoSingle"
             ReferencedContainer = "container:DiscoSingle.xcodeproj">
          </BuildableReference>

@@ -1,0 +1,51 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    #increment_build_number(
+      #xcodeproj: "DiscoSingle.xcodeproj"
+    #)
+    match(
+      force: true,
+      type: "development",
+      git_url: ENV["KEYS_REPOSITORY"],
+      app_identifier: ENV["APP_IDENTIFIER"]
+    )
+    update_info_plist(
+      plist_path: "DiscoSingle/Info.plist",
+      display_name: ENV["APP_NAME"],
+      app_identifier: ENV["APP_IDENTIFIER"]
+    )
+    build_app(
+      workspace: "DiscoSingle.xcworkspace",
+      scheme: "DiscoSingle",
+      clean: true,
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: { 
+          "#{ENV["APP_IDENTIFIER"]}" => "#{ENV["APP_IDENTIFIER"]} AppStore"
+        }
+      },
+      export_xcargs: "-allowProvisioningUpdates",
+      build_path: "./builds",
+      output_directory: "./builds"
+    )
+    upload_to_testflight
+  end
+end

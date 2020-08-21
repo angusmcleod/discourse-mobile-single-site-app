@@ -107,7 +107,7 @@ class Manager {
             ' - ' +
             (Platform.OS == 'android'
               ? DeviceInfo.getModel()
-              : DeviceInfo.getDeviceName()),
+              : DeviceInfo.getDeviceId()),
           public_key: this.rsaKeys.public,
         };
 

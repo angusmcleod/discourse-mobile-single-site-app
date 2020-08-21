@@ -5,6 +5,7 @@ import {
   Linking,
   Text,
   View,
+  SafeAreaView,
   TouchableHighlight,
   Platform,
   ScrollView,
@@ -40,7 +41,7 @@ class App extends React.Component {
     this.state = {
       uri: site,
       promptToConnect: false,
-      skipLogin: false,
+      skipLogin: true,
       appLoading: true,
       username: '',
       password: '',
@@ -49,10 +50,22 @@ class App extends React.Component {
       landscapeLayout: false,
       appState: AppState.currentState,
       pushAuth: false,
+      loggedIn: false,
+      hideNotificationPrompt: false
     };
+    
+    this.clearKeys();
 
     this._Manager = new Manager();
     this._Auth = new Authenticate();
+  }
+  
+  async clearKeys() {
+    try {
+      await AsyncStorage.removeItem('@Discourse.auth')
+    } catch(e) {
+      // remove error
+    }
   }
 
   loadDiscourseAuth() {
@@ -65,7 +78,7 @@ class App extends React.Component {
     this._Manager
       .getUserInfo()
       .then(user => {
-        if (user && user.username) this.setState({skipLogin: true});
+        if (user && user.username) this.setState({loggedIn: true});
       })
       .catch(err => {})
       .done(done => {
@@ -101,6 +114,7 @@ class App extends React.Component {
     }
 
     AsyncStorage.getItem('@Discourse.skipLogin').then(json => {
+      console.log('skip login: ', json)
       if (json && json === 'loginSkipped') {
         this.setState({skipLogin: true});
       }
@@ -244,8 +258,12 @@ class App extends React.Component {
   }
   invokeAuthRedirect(url) {
     let split = url.split('payload=');
+    console.log("Invoking: ", url)
     if (split.length === 2) {
-      OneSignal.registerForPushNotifications();
+      console.log("Registering for push")
+      OneSignal.registerForPushNotifications({
+        modalPrompt: true
+      });
       this._Manager.handleAuthPayload(decodeURIComponent(split[1]));
       this.checkAuthStatus();
     }
@@ -254,7 +272,7 @@ class App extends React.Component {
     if (event.loading && event.url.includes(`?payload=`)) {
       this.invokeAuthRedirect(event.url);
     }
-
+    
     // open device browser for external links in Android
     const internalLink = global.internalURLs.some(v => event.url.includes(v));
 
@@ -268,15 +286,6 @@ class App extends React.Component {
   }
   _handleMessage(event) {
     let data = JSON.parse(event.nativeEvent.data);
-    console.log('_onMessage', data);
-
-    if (data.authenticated !== undefined) {
-      if (this.state.pushAuth) {
-        this.setState({promptToConnect: false});
-      } else {
-        this.setState({promptToConnect: true});
-      }
-    }
 
     if (data.shareUrl !== undefined) {
       Share.share({
@@ -355,11 +364,6 @@ class App extends React.Component {
   renderWebView() {
     return (
       <WebView
-        style={{
-          marginBottom: this.state.promptToConnect ? 50 : 0,
-          marginTop:
-            DeviceInfo.hasNotch() && !this.state.landscapeLayout ? 35 : 20,
-        }}
         ref={ref => {
           this.webview = ref;
         }}
@@ -375,6 +379,7 @@ class App extends React.Component {
           this,
         )}
         renderError={this._renderError.bind(this)}
+        useWebKit={true}
       />
     );
   }
@@ -568,108 +573,25 @@ class App extends React.Component {
 
   render() {
     if (this.state.appLoading) return false;
-
     return (
-      <View
+      <SafeAreaView
         style={{
           flex: 1,
           backgroundColor: global.bgColor,
         }}>
-        {this.state.uri && this.state.skipLogin && this.renderWebView()}
-
-        {!this.state.skipLogin && (
-          <ScrollView
-            contentContainerStyle={{
-              flex: 1,
-              backgroundColor: global.bgColor,
-              padding: 15,
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'stretch',
-            }}>
-            {this.state.landscapeLayout && this.state.keyboardVisible ? null : (
-              <View
-                style={{
-                  flex: 1,
-                  paddingVertical: this.state.keyboardVisible ? 6 : 15,
-                  alignItems: 'stretch',
-                  paddingHorizontal: 20,
-                }}>
-                <Image
-                  source={require('./logo.png')}
-                  resizeMode={'contain'}
-                  style={{width: null, height: null, flex: 1}}
-                />
-              </View>
-            )}
-            <View
-              style={{
-                flex: 3,
-                paddingHorizontal: 20,
-                paddingVertical: 10,
-              }}>
-              {!this.state.keyboardVisible && (
-                <View style={{flex: 1}}>
-                  <Text
-                    style={{
-                      color: global.textColor,
-                      fontSize: 16,
-                      paddingVertical: 10,
-                      textAlign: 'center',
-                    }}>
-                    {global.introText}
-                  </Text>
-                </View>
-              )}
-              {global.showLoginForm && this.renderLoginForm()}
-              {!global.showLoginForm && this.renderStartButtons()}
-
-              <View
-                style={{
-                  paddingVertical: 10,
-                  alignItems: 'center',
-                  flex: 0,
-                  justifyContent: 'flex-end',
-                }}>
-                <TouchableHighlight
-                  onPress={() => {
-                    this.TOS();
-                  }}>
-                  <Text style={{fontSize: 13}}>
-                    <Text style={{color: global.TOSTextColor}}>
-                      {global.TOSText}
-                    </Text>
-                    <Text style={{color: global.textColor}}>
-                      {global.TOSLinkText}
-                    </Text>
-                  </Text>
-                </TouchableHighlight>
-              </View>
-            </View>
-          </ScrollView>
-        )}
-
-        {this.state.promptToConnect && this.state.skipLogin && (
+        {!this.state.pushAuth &&
+          this.state.loggedIn &&
+          !this.state.hideNotificationPrompt && (
           <View
             style={{
-              height: 50,
-              backgroundColor: global.bgColor,
-              padding: 8,
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              flex: 1,
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
+              flex: 0,
+              flexDirection: 'row',
             }}>
             <TouchableHighlight
               style={{
                 backgroundColor: global.connectButtonBgColor,
-                height: 28,
-                padding: 4,
-                borderRadius: 2,
+                padding: 20,
+                flex: 1
               }}
               onPress={() => {
                 this.loadDiscourseAuth();
@@ -677,17 +599,43 @@ class App extends React.Component {
               <Text
                 style={{
                   color: global.connectButtonTextColor,
-                  fontSize: 14,
+                  fontSize: 18,
                   paddingLeft: 8,
                   paddingRight: 8,
                   fontFamily: 'HelveticaNeue-Medium',
+                  textAlign: 'center'
                 }}>
                 {global.connectText}
               </Text>
             </TouchableHighlight>
+            <TouchableHighlight
+              style={{
+                backgroundColor: global.connectButtonBgColor,
+                padding: 20,
+                flex: 0,
+                position: 'absolute',
+                right: 0,
+                top: 5
+              }}
+              onPress={() => {
+                this.setState({ hideNotificationPrompt: true });
+              }}>
+              <Text
+                style={{
+                  color: global.connectButtonTextColor,
+                  fontSize: 18,
+                  paddingLeft: 8,
+                  paddingRight: 8,
+                  fontFamily: 'HelveticaNeue-Medium',
+                  textAlign: 'center'
+                }}>
+                ⨉
+              </Text>
+            </TouchableHighlight>
           </View>
         )}
-      </View>
+        {this.state.uri && this.renderWebView()}
+      </SafeAreaView>
     );
   }
 }
